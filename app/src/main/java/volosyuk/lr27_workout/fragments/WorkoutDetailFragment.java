@@ -7,55 +7,48 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
 import volosyuk.lr27_workout.R;
 import volosyuk.lr27_workout.Workout;
 
-
 public class WorkoutDetailFragment extends Fragment {
-
     private long workoutId;
-
-    public WorkoutDetailFragment() {
-
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState != null) {
+
+        if (savedInstanceState == null) {
+            StopwatchFragment stopwatch = new StopwatchFragment();
+            FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+            ft.add(R.id.stopwatch_container, stopwatch);
+            ft.addToBackStack(null);
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+            ft.commit();
+        } else {
             workoutId = savedInstanceState.getLong("workoutId");
-            setWorkout(workoutId); // Убедитесь, что workoutId установлен
         }
     }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    @Override public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle
+            savedInstanceState){
         return inflater.inflate(R.layout.fragment_workout_detail, container, false);
     }
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putLong("workoutId", workoutId);
-    }
-
-    @Override
-    public void onStart() {
+    @Override public void onStart () {
         super.onStart();
         View view = getView();
-
-        if (view != null && workoutId >= 0 && workoutId < Workout.workouts.length) {
+        if (view != null) {
+            TextView title = (TextView) view.findViewById(R.id.textTitle);
             Workout workout = Workout.workouts[(int) workoutId];
-
-            TextView title = view.findViewById(R.id.textTitle);
             title.setText(workout.getName());
-
-            TextView description = view.findViewById(R.id.textDescription);
+            TextView description = (TextView) view.findViewById(R.id.textDescription);
             description.setText(workout.getDescription());
         }
     }
-
-    public void setWorkout(long id) {
+    @Override public void onSaveInstanceState (Bundle savedInstanceState){
+        savedInstanceState.putLong("workoutId", workoutId);
+    }
+    public void setWorkout ( long id){
         this.workoutId = id;
     }
 }
